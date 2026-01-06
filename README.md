@@ -1,8 +1,8 @@
 # Nara AI - Sahabat Belajar Pintar
 
-![Nara AI Banner](https://kangpepey.com/nara/assets/img/logo.png)
+#### Kunjungi Website: Buka kangpepey.com/nara/
 
-Nara AI adalah asisten pendidikan berbasis kecerdasan buatan (AI) yang dirancang khusus untuk membantu siswa dan mahasiswa di Indonesia dalam menyelesaikan tugas sekolah, memahami materi pelajaran sulit, dan mempersiapkan ujian dengan cara yang interaktif dan instan.
+Nara AI adalah asisten pendidikan berbasis kecerdasan buatan (AI) yang dirancang khusus untuk membantu siswa dan mahasiswa di Indonesia dalam menyelesaikan tugas sekolah, memahami materi pelajaran sulit, dan mempersiapkan ujian dengan cara yang interaktif dan instan. Ini dirancang murni menggunaka JavaScript untuk penerapan dan Integrasi dengan Gemini AI
 
 ---
 
