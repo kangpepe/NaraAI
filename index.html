@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nara AI - Platform Edukasi Keamanan Digital Gen Z</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --dark-tosca: #0f8585;
+            --medium-tosca: #20B2AA;
+            --light-tosca: #E0F7FA;
+            --primary-green: #26A69A;
+            --light-green: #F0FFF0;
+            --dark-green: #022331;
+            --primary-orange: #FFA500;
+            --light-orange: #FFF3E0;
+            --dark-orange: #042c3d;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E0E0E0;
+            --dark-gray: #616161;
+            --text-dark: #333333;
+            --user-msg: #E1F5FE;
+            --ai-msg: #F1F8E9;
+            --voice-msg: #FFF3E0;
+            --warning: #FF5252;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark-tosca) 0%, var(--dark-green) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-logo {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: white;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--dark-tosca) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 20px 20px 15px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 128, 128, 0.3);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.6rem;
+        }
+        
+        .logo i {
+            margin-right: 12px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-orange) 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-profile {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .user-profile img{
+            width: 43px;
+            height: 43px;
+            border-radius: 50%;
+        }
+        
+        .user-profile:hover {
+            transform: scale(1.05);
+        }
+        
+        .ai-coach-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.12);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ai-avatar {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--dark-tosca) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .ai-text h2 {
+            font-size: 14px;
+            margin-bottom: 1px;
+            font-weight: 600;
+        }.ai-text h2 small {
+            font-weight: normal;
+        }
+        
+        .ai-text p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 5px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px 5px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            color: var(--dark-tosca);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Main Content */
+        .content-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .tab-content {
+            flex-grow: 1;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Chat Container */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 55vh;
+        }
+        
+        .message {
+            max-width: 95%;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 20px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.4s ease-in;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--user-msg);
+            border-bottom-right-radius: 5px;
+            margin-left: auto;
+            border: 1px solid rgba(32, 178, 170, 0.2);
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--ai-msg);
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(144, 238, 144, 0.2);
+        }
+        
+        .ai-message.tosca {
+            border-left: 4px solid var(--dark-tosca);
+        }
+        
+        .ai-message.green {
+            border-left: 4px solid var(--dark-green);
+        }
+        
+        .ai-message.orange {
+            border-left: 4px solid var(--primary-orange);
+        }
+        
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .message-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .user-message .message-avatar {
+            background-color: var(--dark-tosca);
+            color: white;
+        }
+        
+        .ai-message .message-avatar {
+            background-color: var(--dark-green);
+            color: white;
+        }
+        
+        .message-sender {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        
+        .user-message .message-sender {
+            color: var(--dark-tosca);
+        }
+        
+        .ai-message .message-sender {
+            color: var(--dark-green);
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--dark-gray);
+            margin-left: auto;
+        }
+        
+        .message-content {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        .message-content ol {
+            padding: 8px 15px;
+        }
+        
+        /* Voice Message */
+        .voice-message {
+            background-color: var(--voice-msg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+        }
+        
+        .voice-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            color: var(--dark-orange);
+        }
+        
+        .voice-header i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .voice-player {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-orange);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(255, 165, 0, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .play-btn.playing {
+            background-color: var(--dark-orange);
+        }
+        
+        .voice-waveform {
+            flex-grow: 1;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                var(--medium-gray) 2px,
+                var(--medium-gray) 4px
+            );
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .voice-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--primary-orange);
+            width: 0%;
+            border-radius: 20px;
+            transition: width 0.1s linear;
+        }
+        
+        .voice-duration {
+            margin-left: 15px;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        /* Solusi Container */
+        .solution-container {
+            margin-top: 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--medium-gray);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .solution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .solution-tosca .solution-header {
+            background-color: var(--dark-tosca);
+        }
+        
+        .solution-green .solution-header {
+            background-color: var(--dark-green);
+        }
+        
+        .solution-orange .solution-header {
+            background-color: var(--primary-orange);
+        }
+        
+        .solution-type {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+        }
+        .solution-topic{
+            font-size: 11px;
+        }
+        
+        .solution-type i {
+            margin-right: 8px;
+        }
+        
+        .solution-content {
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .video-solution {
+            text-align: center;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--dark-tosca) 0%, var(--dark-green) 100%);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .video-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .video-placeholder p {
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+        
+        .play-btn-video {
+            background: linear-gradient(to right, var(--dark-tosca), var(--dark-green));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0, 128, 128, 0.3);
+            transition: transform 0.2s;
+        }
+        
+        .play-btn-video:hover {
+            transform: translateY(-2px);
+        }
+        
+        .play-btn-video i {
+            margin-right: 8px;
+        }
+        
+        .text-solution {
+            line-height: 1.6;
+        }
+        
+        .text-solution h4 {
+            color: var(--dark-tosca);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .text-solution ul, .text-solution ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .text-solution li {
+            margin-bottom: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.2s;
+            font-size: 11px;
+        }
+        
+        .action-btn i {
+            margin-right: 11px;
+        }
+        
+        .save-btn {
+            background-color: var(--dark-tosca);
+            color: white;
+        }
+        
+        .share-btn {
+            background-color: var(--dark-green);
+            color: white;
+        }
+        
+        .quiz-btn {
+            background-color: var(--primary-orange);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Microlearning Tab */
+        .modules-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .module-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--medium-gray);
+        }
+        
+        .module-card.tosca {
+            border-top: 4px solid var(--dark-tosca);
+        }
+        
+        .module-card.green {
+            border-top: 4px solid var(--dark-green);
+        }
+        
+        .module-card.orange {
+            border-top: 4px solid var(--primary-orange);
+        }
+        
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .module-card.tosca .module-icon {
+            background-color: var(--dark-tosca);
+        }
+        
+        .module-card.green .module-icon {
+            background-color: var(--dark-green);
+        }
+        
+        .module-card.orange .module-icon {
+            background-color: var(--primary-orange);
+        }
+        
+        .module-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .module-desc {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .module-progress {
+            width: 100%;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            color: var(--dark-gray);
+        }
+        
+        .progress-bar-container {
+            height: 6px;
+            background-color: var(--medium-gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .module-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .module-card.tosca .module-progress-fill {
+            background-color: var(--dark-tosca);
+        }
+        
+        .module-card.green .module-progress-fill {
+            background-color: var(--dark-green);
+        }
+        
+        .module-card.orange .module-progress-fill {
+            background-color: var(--primary-orange);
+        }
+        
+        /* Input Container */
+        .input-container {
+            padding: 15px 20px;
+            border-top: 1px solid var(--medium-gray);
+            background-color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-gray);
+            border-radius: 25px;
+            padding: 5px 5px 5px 15px;
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--dark-tosca);
+            box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.1);
+        }
+        
+        .input-wrapper input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        
+        .voice-input-btn {
+            background-color: var(--dark-orange);
+            color: var(--white);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        
+        .voice-input-btn.recording {
+            background-color: var(--warning);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--dark-tosca) 0%, var(--dark-green) 100%);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .input-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .input-option {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid var(--medium-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--dark-gray);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .input-option:hover {
+            background-color: var(--light-tosca);
+            border-color: var(--dark-tosca);
+            color: var(--dark-tosca);
+        }
+        
+        .input-option i {
+            margin-right: 8px;
+        }
+        
+        /* Bottom Navigation */
+        nav {
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 10px;
+            border-top: 1px solid var(--medium-gray);
+            flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            flex: 1;
+            position: relative;
+        }
+        
+        .nav-item.active {
+            color: var(--dark-tosca);
+        }
+        
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item .badge {
+            position: absolute;
+            top: -5px;
+            right: 10px;
+            background-color: var(--warning);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .modules-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-text h2 {
+                font-size: 1.2rem;
+            }
+            
+            .ai-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 1.5rem;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .input-options {
+                flex-direction: column;
+            }
+            
+            .input-option {
+                justify-content: center;
+            }
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark-tosca);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            max-width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .notification.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-logo">
+            <i class="fas fa-robot"></i>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="loading-progress"></div>
+        </div>
+        <div class="loading-text">Memuat Nara AI Platform...</div>
+    </div>
+    
+    <header>
+        <div class="header-top">
+            <div class="logo">
+                <i class="fa-duotone fa-solid fa-robot"></i>
+                <span>Nara AI</span>
+            </div>
+            <div class="user-profile" id="user-profile">
+                <a href="index.html"><img src="download.png" alt=""></a>
+            </div>
+        </div>
+        
+        <div class="ai-coach-info">
+            <div class="ai-avatar">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="ai-text">
+                <h2><small>Hai</small> Novi Hardiansyah</h2>
+                <p>Next-gen Awareness & Risk Analyzer (NaraAI).</p>
+            </div>
+        </div>
+        
+        <div class="tab-navigation">
+            <div class="tab-btn active" data-tab="chat">
+                <i class="fas fa-comments"></i> Chat
+            </div>
+            <div class="tab-btn" data-tab="learn">
+                <i class="fas fa-graduation-cap"></i> Belajar
+            </div>
+            <div class="tab-btn" data-tab="resources">
+                <i class="fas fa-database"></i> Database
+            </div>
+        </div>
+    </header>
+    
+    <div class="content-container">
+        <!-- Chat Tab -->
+        <div class="tab-content active" id="chat-tab">
+            <div class="chat-container" id="chat-container">
+                <!-- Pesan default akan dimuat via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Learn Tab -->
+        <div class="tab-content" id="learn-tab">
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--dark-tosca); margin-bottom: 15px;">Modul Microlearning</h3>
+                <p style="color: var(--dark-gray); margin-bottom: 20px; font-size: 0.95rem;">Pilih modul untuk memperkuat pengetahuan keamanan digital Anda. Setiap modul dapat diselesaikan dalam 5-10 menit.</p>
+            </div>
+            
+            <div class="modules-container" id="modules-container">
+                <!-- Modul akan dimuat via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Resources Tab -->
+        <div class="tab-content" id="resources-tab">
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: var(--dark-tosca); margin-bottom: 15px;">Database Keamanan Digital</h3>
+                <p style="color: var(--dark-gray); margin-bottom: 20px; font-size: 0.95rem;">Akses kumpulan informasi, statistik, dan sumber daya tentang keamanan digital untuk Gen Z.</p>
+            </div>
+            
+            <div id="resources-container">
+                <!-- Resources akan dimuat via JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Ayuuuk tanya NaraAI ... !!">
+            <button class="voice-input-btn" id="voice-input-btn" title="Rekam Voice Note">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="send-btn" id="send-btn" title="Kirim Pesan">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="input-options">
+            <div class="input-option" id="text-solution-btn">
+                <i class="fas fa-file-alt"></i>
+                <span>Minta Solusi Teks</span>
+            </div>
+            <div class="input-option" id="video-solution-btn">
+                <i class="fas fa-video"></i>
+                <span>Minta Solusi Video</span>
+            </div>
+        </div>
+    </div>
+    
+    <nav>
+        <a href="index.html" class="nav-item" id="nav-home">
+            <i class="fas fa-home"></i>
+            <span>Beranda</span>
+        </a>
+        <a href="#" class="nav-item active" id="nav-coach"  onclick="goFullscreen()">
+            <i class="fas fa-robot"></i>
+            <span>NARA Coach</span>
+            <div class="badge" id="message-badge">3</div>
+        </a>
+        <a href="#" class="nav-item" id="nav-progress">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-profile">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+    
+    <!-- Notification -->
+    <div class="notification hidden" id="notification">
+        <i class="fas fa-info-circle"></i>
+        <span id="notification-text">Notification message</span>
+    </div>
+    
+    <script>
+        // Database informasi keamanan digital yang lebih lengkap
+        const securityDatabase = {
+            "password": {
+                id: 1,
+                category: "Autentikasi",
+                topic: "Keamanan Password",
+                difficulty: "Pemula",
+                duration: "8 menit",
+                text: {
+                    title: "Panduan Lengkap Password Aman",
+                    content: `<h4>Prinsip Dasar Password Aman:</h4>
+                    <ol>
+                        <li><strong>Panjang Minimal 12 Karakter</strong> - Semakin panjang password, semakin sulit diretas</li>
+                        <li><strong>Kombinasi Karakter</strong> - Gunakan huruf besar, kecil, angka, dan simbol</li>
+                        <li><strong>Hindari Informasi Pribadi</strong> - Jangan gunakan nama, tanggal lahir, atau kata yang mudah ditebak</li>
+                        <li><strong>Password Unik</strong> - Gunakan password berbeda untuk setiap akun penting</li>
+                    </ol>
+                    
+                    <h4>Teknik Membuat Password Kuat:</h4>
+                    <ul>
+                        <li><strong>Metode Frasa</strong>: Pilih 4-5 kata acak seperti "KucingBiru@MelompatTinggi2024!"</li>
+                        <li><strong>Metode Substitusi</strong>: Ganti huruf dengan karakter khusus, misal "P@ssw0rd!"</li>
+                        <li><strong>Metode Akronim</strong>: Buat dari kalimat favorit, misal "SayaLahirDiJakarta2000" menjadi "SLDJ2k!"</li>
+                    </ul>
+                    
+                    <h4>Tools Rekomendasi:</h4>
+                    <ul>
+                        <li><strong>Password Manager</strong>: LastPass, Bitwarden, 1Password</li>
+                        <li><strong>Generator Password</strong>: built-in di password manager atau browser</li>
+                        <li><strong>Pemeriksa Kekuatan</strong>: HaveIBeenPwned, Google Password Checkup</li>
+                    </ul>`,
+                    stats: {
+                        "Pengguna reuse password": "65%",
+                        "Rata-rata jumlah password per user": "8-10",
+                        "Waktu crack password 8 karakter": "8 jam",
+                        "Waktu crack password 12 karakter": "34 tahun"
+                    }
+                },
+                video: {
+                    title: "Video Tutorial: Membuat dan Mengelola Password Aman",
+                    duration: "6 menit 45 detik",
+                    level: "Pemula",
+                    url: "#"
+                },
+                voiceNote: {
+                    duration: "2 menit 15 detik",
+                    transcript: "Halo! Untuk password yang aman, pastikan minimal 12 karakter dengan kombinasi huruf besar, kecil, angka, dan simbol. Hindari informasi pribadi dan gunakan password manager. Jangan lupa aktifkan 2FA untuk proteksi ekstra!"
+                }
+            },
+            "phishing": {
+                id: 2,
+                category: "Social Engineering",
+                topic: "Deteksi dan Pencegahan Phishing",
+                difficulty: "Menengah",
+                duration: "10 menit",
+                text: {
+                    title: "Panduan Deteksi Serangan Phishing",
+                    content: `<h4>Tanda-tanda Email Phishing:</h4>
+                    <ol>
+                        <li><strong>Pengirim Mencurigakan</strong> - Alamat email mirip tapi tidak sama dengan asli</li>
+                        <li><strong>Permintaan Darurat</strong> - Meminta tindakan segera seperti "verifikasi akun sekarang"</li>
+                        <li><strong>Link Tidak Jelas</strong> - Arahkan kursor untuk melihat URL sebenarnya</li>
+                        <li><strong>Kesalahan Tata Bahasa</strong> - Banyak typo dan kalimat aneh</li>
+                        <li><strong>Lampiran Mencurigakan</strong> - File .exe, .zip dari pengirim tidak dikenal</li>
+                    </ol>
+                    
+                    <h4>Statistik Phishing 2024:</h4>
+                    <ul>
+                        <li>Serangan phishing meningkat 65% dibanding 2023</li>
+                        <li>96% serangan phishing via email, 3% via SMS, 1% via telepon</li>
+                        <li>Industri paling banyak diserang: Finansial (45%), Teknologi (20%), Kesehatan (15%)</li>
+                        <li>Kerugian rata-rata per insiden phishing: $4.35 juta</li>
+                    </ul>
+                    
+                    <h4>Langkah-langkah jika Terkena Phishing:</h4>
+                    <ol>
+                        <li>Jangan klik link atau buka lampiran</li>
+                        <li>Laporkan email ke provider (Gmail, Outlook, dll)</li>
+                        <li>Ubah password akun yang terkait</li>
+                        <li>Pantai aktivitas mencurigakan di akun</li>
+                        <li>Laporkan ke otoritas jika terjadi kerugian finansial</li>
+                    </ol>`,
+                    stats: {
+                        "Email phishing terdeteksi per hari": "3.4 juta",
+                        "Klik link phishing oleh karyawan": "3%",
+                        "Waktu rata-rata pelaporan phishing": "16 jam",
+                        "Penurunan risiko dengan training": "80%"
+                    }
+                },
+                video: {
+                    title: "Video Tutorial: Analisis Email Phishing Langkah demi Langkah",
+                    duration: "8 menit 30 detik",
+                    level: "Menengah",
+                    url: "#"
+                },
+                voiceNote: {
+                    duration: "3 menit 10 detik",
+                    transcript: "Waspada email phishing! Cek pengirim, hindari klik link mencurigakan, dan jangan berikan informasi sensitif. Email bank tidak akan minta password via email. Laporkan ke phishing-report@us-cert.gov jika menemukan."
+                }
+            },
+            "sosmed": {
+                id: 3,
+                category: "Privasi Digital",
+                topic: "Keamanan Media Sosial",
+                difficulty: "Pemula",
+                duration: "7 menit",
+                text: {
+                    title: "Panduan Privasi Media Sosial",
+                    content: `<h4>Pengaturan Privasi Penting:</h4>
+                    <ol>
+                        <li><strong>Profil Pribadi</strong> - Atur akun sebagai private/profil pribadi</li>
+                        <li><strong>Tagging Review</strong> - Aktifkan fitur review sebelum ditandai</li>
+                        <li><strong>Lokasi</strong> - Matikan fitur pelacakan lokasi otomatis</li>
+                        <li><strong>Data Iklan</strong> - Batasi data yang digunakan untuk iklan</li>
+                        <li><strong>Akses Aplikasi</strong> - Review aplikasi yang terhubung ke akun</li>
+                    </ol>
+                    
+                    <h4>Informasi yang Tidak Boleh Dibagikan:</h4>
+                    <ul>
+                        <li>Alamat rumah lengkap</li>
+                        <li>Nomor telepon pribadi</li>
+                        <li>Tanggal lahir lengkap (tahun penting)</li>
+                        <li>Foto dokumen resmi (KTP, SIM, Paspor)</li>
+                        <li>Jadwal rutin dan lokasi spesifik</li>
+                        <li>Informasi keuangan</li>
+                    </ul>
+                    
+                    <h4>Statistik Keamanan Media Sosial:</h4>
+                    <ul>
+                        <li>63% akun media sosial pernah diretas atau dicoba diretas</li>
+                        <li>Hanya 32% pengguna yang menggunakan 2FA di media sosial</li>
+                        <li>74% perusahaan menggunakan media sosial untuk screening calon karyawan</li>
+                        <li>1 dari 10 pengguna pernah menjadi korban cyberbullying di media sosial</li>
+                    </ul>`,
+                    stats: {
+                        "Pengguna media sosial di Indonesia": "191 juta",
+                        "Rata-rata waktu per hari": "3 jam 18 menit",
+                        "Akun dengan pengaturan privasi maksimal": "41%",
+                        "Insiden doxing tahun 2023": "12.500"
+                    }
+                },
+                video: {
+                    title: "Video Tutorial: Pengaturan Privasi Instagram, Facebook, TikTok",
+                    duration: "9 menit 15 detik",
+                    level: "Pemula",
+                    url: "#"
+                },
+                voiceNote: {
+                    duration: "2 menit 45 detik",
+                    transcript: "Untuk keamanan media sosial, aktifkan 2FA, batasi informasi pribadi, dan review pengaturan privasi. Hati-hati dengan informasi yang dibagikan - sekali online, selamanya online. Gunakan password berbeda untuk setiap platform."
+                }
+            },
+            "malware": {
+                id: 4,
+                category: "Teknis",
+                topic: "Pencegahan Malware",
+                difficulty: "Menengah",
+                duration: "9 menit",
+                text: {
+                    title: "Panduan Pertahanan dari Malware",
+                    content: `<h4>Jenis-jenis Malware:</h4>
+                    <ol>
+                        <li><strong>Virus</strong> - Menyebar via file executable, menginfeksi sistem</li>
+                        <li><strong>Ransomware</strong> - Mengenkripsi data dan minta tebusan</li>
+                        <li><strong>Spyware</strong> - Memata-matai aktivitas pengguna</li>
+                        <li><strong>Adware</strong> - Menampilkan iklan berlebihan</li>
+                        <li><strong>Trojan</strong> - Menyamar sebagai software legit</li>
+                        <li><strong>Worm</strong> - Menyebar sendiri melalui jaringan</li>
+                    </ol>
+                    
+                    <h4>Vektor Serangan Umum:</h4>
+                    <ul>
+                        <li>Email lampiran berbahaya (35%)</li>
+                        <li>Download software bajakan (28%)</li>
+                        <li>Klik link berbahaya (22%)</li>
+                        <li>Drive-by download (10%)</li>
+                        <li>USB terinfeksi (5%)</li>
+                    </ul>
+                    
+                    <h4>Statistik Malware Global 2024:</h4>
+                    <ul>
+                        <li>5.5 miliar serangan malware terdeteksi tahun 2023</li>
+                        <li>Ransomware meningkat 37% dengan tebusan rata-rata $1.5 juta</li>
+                        <li>Malware mobile meningkat 54%, terutama Android</li>
+                        <li>Waktu deteksi rata-rata malware: 56 hari</li>
+                        <li>Biaya pemulihan rata-rata per insiden: $2.6 juta</li>
+                    </ul>
+                    
+                    <h4>Antivirus Rekomendasi:</h4>
+                    <ul>
+                        <li><strong>Windows</strong>: Bitdefender, Kaspersky, Windows Defender</li>
+                        <li><strong>Mac</strong>: Intego, Malwarebytes, Norton</li>
+                        <li><strong>Android</strong>: Malwarebytes, AVG, McAfee</li>
+                        <li><strong>iOS</strong>: Tidak perlu antivirus khusus</li>
+                    </ul>`,
+                    stats: {
+                        "Serangan malware per menit": "10.500",
+                        "Malware baru per hari": "450.000",
+                        "Perangkat IoT terinfeksi": "15 miliar",
+                        "Kenaikan serangan ransomware": "37%"
+                    }
+                },
+                video: {
+                    title: "Video Tutorial: Scan dan Hapus Malware dari Smartphone",
+                    duration: "7 menit 20 detik",
+                    level: "Menengah",
+                    url: "#"
+                },
+                voiceNote: {
+                    duration: "3 menit 30 detik",
+                    transcript: "Untuk hindari malware, update software rutin, hindari klik link mencurigakan, gunakan antivirus, dan backup data penting. Jangan install aplikasi dari sumber tidak resmi. Waspada email dengan lampiran .exe atau .zip."
+                }
+            },
+            "2fa": {
+                id: 5,
+                category: "Autentikasi",
+                topic: "Autentikasi Dua Faktor",
+                difficulty: "Pemula",
+                duration: "6 menit",
+                text: {
+                    title: "Panduan Lengkap Autentikasi Dua Faktor",
+                    content: `<h4>Jenis-jenis 2FA:</h4>
+                    <ol>
+                        <li><strong>SMS/Telepon</strong> - Kode dikirim via SMS atau telepon (kurang aman)</li>
+                        <li><strong>Aplikasi Authenticator</strong> - Google Authenticator, Microsoft Authenticator (lebih aman)</li>
+                        <li><strong>Security Key</strong> - YubiKey, Titan Security Key (paling aman)</li>
+                        <li><strong>Biometrik</strong> - Sidik jari, pengenalan wajah</li>
+                        <li><strong>Push Notification</strong> - Notifikasi persetujuan di device terpercaya</li>
+                    </ol>
+                    
+                    <h4>Platform Penting yang Harus Pakai 2FA:</h4>
+                    <ul>
+                        <li>Email (Gmail, Outlook, Yahoo)</li>
+                        <li>Media Sosial (Facebook, Instagram, Twitter)</li>
+                        <li>Perbankan dan Fintech</li>
+                        <li>Dompet digital dan crypto</li>
+                        <li>Aplikasi kerja (Slack, Zoom, Microsoft 365)</li>
+                        <li>Cloud storage (Google Drive, Dropbox)</li>
+                    </ul>
+                    
+                    <h4>Statistik Efektivitas 2FA:</h4>
+                    <ul>
+                        <li>2FA mencegah 99.9% serangan akun otomatis</li>
+                        <li>Hanya 26% pengguna internet yang aktif menggunakan 2FA</li>
+                        <li>Serangan SIM swapping meningkat 400% sejak 2018</li>
+                        <li>Biometric authentication adoption: 57% pada smartphone 2024</li>
+                    </ul>`,
+                    stats: {
+                        "Pengurangan risiko dengan 2FA": "99.9%",
+                        "Pengguna 2FA di Indonesia": "18%",
+                        "Insiden SIM swapping 2023": "45.000",
+                        "Adopsi security key": "12% perusahaan"
+                    }
+                },
+                video: {
+                    title: "Video Tutorial: Setup 2FA untuk Semua Akun Penting",
+                    duration: "5 menit 45 detik",
+                    level: "Pemula",
+                    url: "#"
+                },
+                voiceNote: {
+                    duration: "2 menit",
+                    transcript: "Aktifkan 2FA sekarang! Gunakan aplikasi authenticator, bukan SMS. Simpan backup codes dengan aman. Untuk akun penting, pertimbangkan security key. 2FA mengurangi risiko peretasan hingga 99.9%."
+                }
+            }
+        };
+
+        // Database Microlearning Modules
+        const microlearningModules = [
+            {
+                id: 1,
+                title: "Password Mastery",
+                description: "Pelajari seni membuat password kuat dan mudah diingat",
+                icon: "fas fa-lock",
+                category: "password",
+                progress: 75,
+                color: "tosca",
+                duration: "8 menit",
+                lessons: 4
+            },
+            {
+                id: 2,
+                title: "Phishing Detective",
+                description: "Jadi ahli deteksi email dan website phishing",
+                icon: "fas fa-fish",
+                category: "phishing",
+                progress: 40,
+                color: "green",
+                duration: "10 menit",
+                lessons: 5
+            },
+            {
+                id: 3,
+                title: "Social Media Guardian",
+                description: "Kunci rapat privasi akun media sosial Anda",
+                icon: "fas fa-user-shield",
+                category: "sosmed",
+                progress: 90,
+                color: "orange",
+                duration: "7 menit",
+                lessons: 3
+            },
+            {
+                id: 4,
+                title: "Malware Defense",
+                description: "Teknik pertahanan dari virus dan ransomware",
+                icon: "fas fa-shield-virus",
+                category: "malware",
+                progress: 25,
+                color: "tosca",
+                duration: "9 menit",
+                lessons: 6
+            },
+            {
+                id: 5,
+                title: "2FA Essentials",
+                description: "Setup autentikasi dua faktor untuk semua akun",
+                icon: "fas fa-key",
+                category: "2fa",
+                progress: 60,
+                color: "green",
+                duration: "6 menit",
+                lessons: 3
+            },
+            {
+                id: 6,
+                title: "Digital Footprint",
+                description: "Kelola jejak digital dan reputasi online",
+                icon: "fas fa-shoe-prints",
+                category: "privacy",
+                progress: 10,
+                color: "orange",
+                duration: "8 menit",
+                lessons: 4
+            }
+        ];
+
+        // Chat history
+        let chatHistory = [];
+        let currentRecording = false;
+        let audioContext = null;
+        let voiceRecorder = null;
+        let currentVoiceNote = null;
+
+        // DOM Elements
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingProgress = document.getElementById('loading-progress');
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const voiceInputBtn = document.getElementById('voice-input-btn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const modulesContainer = document.getElementById('modules-container');
+        const resourcesContainer = document.getElementById('resources-container');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Initialize the application
+        function initApp() {
+            // Simulate loading progress
+            let progress = 0;
+            const loadingInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 100) {
+                    progress = 100;
+                    clearInterval(loadingInterval);
+                    
+                    // Hide loading screen after a short delay
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        showNotification("Nara AI siap membantu masalah anda.", "info");
+                        loadInitialData();
+                    }, 500);
+                }
+                loadingProgress.style.width = `${progress}%`;
+            }, 200);
+            
+            // Initialize event listeners
+            initEventListeners();
+        }
+
+        function initEventListeners() {
+            // Send button event
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Enter key event
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Voice input button
+            voiceInputBtn.addEventListener('click', toggleVoiceRecording);
+            
+            // Tab navigation
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Navigation items
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    if (item.id === 'nav-home') {
+                        showNotification("Redirect ke halaman beranda...", "info");
+                    } else if (item.id === 'nav-progress') {
+                        showNotification("Membuka dashboard progress belajar...", "info");
+                    } else if (item.id === 'nav-profile') {
+                        showNotification("Membuka halaman profil pengguna...", "info");
+                    }
+                });
+            });
+            
+            // Input options
+            document.getElementById('text-solution-btn').addEventListener('click', () => {
+                if (userInput.value.trim()) {
+                    processUserInput('text');
+                } else {
+                    userInput.value = "Berikan solusi teks tentang keamanan password";
+                    processUserInput('text');
+                }
+            });
+            
+            document.getElementById('video-solution-btn').addEventListener('click', () => {
+                if (userInput.value.trim()) {
+                    processUserInput('video');
+                } else {
+                    userInput.value = "Berikan solusi video tentang cara deteksi phishing";
+                    processUserInput('video');
+                }
+            });
+            
+            document.getElementById('quick-quiz-btn').addEventListener('click', () => {
+                startQuickQuiz();
+            });
+            
+            // User profile
+            document.getElementById('user-profile').addEventListener('click', () => {
+                showNotification("Membuka profil pengguna...", "info");
+            });
+        }
+
+        function loadInitialData() {
+            // Load initial chat messages
+            addChatMessage("ai", "Halo! Saya NaraAI Coach, asisten keamanan digital Generasi Z. Saya dapat membantu keresahan Keamanan Siber anda. Tanyakan apa saja atau klik tab 'Belajar' untuk modul microlearning.", "tosca");
+            
+            // Load microlearning modules
+            loadMicrolearningModules();
+            
+            // Load resources
+            loadResources();
+        }
+
+        function loadMicrolearningModules() {
+            modulesContainer.innerHTML = '';
+            
+            microlearningModules.forEach(module => {
+                const moduleCard = document.createElement('div');
+                moduleCard.className = `module-card ${module.color}`;
+                moduleCard.innerHTML = `
+                    <div class="module-icon">
+                        <i class="${module.icon}"></i>
+                    </div>
+                    <div class="module-title">${module.title}</div>
+                    <div class="module-desc">${module.description}</div>
+                    <div class="module-progress">
+                        <div class="progress-text">
+                            <span>Progress</span>
+                            <span>${module.progress}%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="module-progress-fill" style="width: ${module.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                moduleCard.addEventListener('click', () => {
+                    switchTab('chat');
+                    userInput.value = `Saya ingin belajar tentang ${module.title.toLowerCase()}`;
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 300);
+                });
+                
+                modulesContainer.appendChild(moduleCard);
+            });
+        }
+
+        function loadResources() {
+            resourcesContainer.innerHTML = '';
+            
+            Object.keys(securityDatabase).forEach(key => {
+                const resource = securityDatabase[key];
+                const resourceCard = document.createElement('div');
+                resourceCard.className = 'module-card tosca';
+                resourceCard.style.marginBottom = '15px';
+                resourceCard.innerHTML = `
+                    <div class="module-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="module-title">${resource.topic}</div>
+                    <div class="module-desc">Kategori: ${resource.category} | Level: ${resource.difficulty}</div>
+                    <div class="module-progress">
+                        <div class="progress-text">
+                            <span>Informasi tersedia:</span>
+                            <span>${resource.duration}</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="module-progress-fill" style="width: 100%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                resourceCard.addEventListener('click', () => {
+                    showResourceDetails(resource);
+                });
+                
+                resourcesContainer.appendChild(resourceCard);
+            });
+        }
+
+        function showResourceDetails(resource) {
+            switchTab('chat');
+            
+            // Create detailed resource message
+            const resourceMessage = `
+                <h4>📊 ${resource.topic} - Database Informasi</h4>
+                <p><strong>Kategori:</strong> ${resource.category}</p>
+                <p><strong>Level Kesulitan:</strong> ${resource.difficulty}</p>
+                <p><strong>Durasi Belajar:</strong> ${resource.duration}</p>
+                
+                <h5>Statistik Penting:</h5>
+                <ul>
+                    ${Object.entries(resource.text.stats).map(([key, value]) => 
+                        `<li><strong>${key}:</strong> ${value}</li>`
+                    ).join('')}
+                </ul>
+                
+                <h5>Konten Tersedia:</h5>
+                <ul>
+                    <li>📝 Solusi teks lengkap</li>
+                    <li>🎥 Video tutorial (${resource.video.duration})</li>
+                    <li>🎤 Voice note (${resource.voiceNote.duration})</li>
+                </ul>
+                
+                <button class="action-btn save-btn" onclick="showNotification('Menambahkan ${resource.topic} ke favorit', 'success')">
+                    <i class="fas fa-star"></i> Favorit
+                </button>
+                <button class="action-btn share-btn" onclick="showNotification('Membagikan resource ${resource.topic}', 'info')">
+                    <i class="fas fa-share-alt"></i> Bagikan
+                </button>
+            `;
+            
+            addChatMessage("ai", resourceMessage, "tosca", true);
+        }
+
+        function switchTab(tabId) {
+            // Update active tab button
+            tabBtns.forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Show active tab content
+            tabContents.forEach(content => {
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Update navigation
+            if (tabId === 'chat') {
+                document.getElementById('nav-coach').classList.add('active');
+            }
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addChatMessage("user", message);
+            
+            // Process AI response
+            setTimeout(() => {
+                processUserInput('text');
+            }, 500);
+            
+            // Clear input
+            userInput.value = '';
+        }
+
+        function processUserInput(solutionType = 'text') {
+            const userMessage = chatHistory[chatHistory.length - 1]?.content || "";
+            const topic = detectTopic(userMessage);
+            
+            // Simulate AI thinking
+            showNotification("AI Coach sedang menganalisis pertanyaan...", "info");
+            
+            setTimeout(() => {
+                const response = securityDatabase[topic] || securityDatabase["password"];
+                
+                if (solutionType === 'video') {
+                    addAIVideoResponse(topic, userMessage, response);
+                } else if (solutionType === 'voice') {
+                    addAIVoiceResponse(topic, userMessage, response);
+                } else {
+                    addAITextResponse(topic, userMessage, response);
+                }
+                
+                // Update message badge
+                updateMessageBadge();
+            }, 1500);
+        }
+
+        function detectTopic(userInput) {
+            const input = userInput.toLowerCase();
+            
+            if (input.includes('password') || input.includes('kata sandi') || input.includes('pass')) {
+                return 'password';
+            } else if (input.includes('phishing') || input.includes('email') || input.includes('penipuan')) {
+                return 'phishing';
+            } else if (input.includes('media sosial') || input.includes('sosmed') || input.includes('instagram') || input.includes('facebook')) {
+                return 'sosmed';
+            } else if (input.includes('malware') || input.includes('virus') || input.includes('ransomware')) {
+                return 'malware';
+            } else if (input.includes('2fa') || input.includes('autentikasi dua') || input.includes('verifikasi dua')) {
+                return '2fa';
+            } else {
+                // Default to password if no match
+                return 'password';
+            }
+        }
+
+        function addChatMessage(sender, content, color = "tosca", isHTML = false) {
+            const messageId = Date.now();
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message ${sender === 'ai' ? color : ''}`;
+            messageDiv.id = `msg-${messageId}`;
+            
+            if (isHTML) {
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-avatar">
+                            <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
+                        </div>
+                        <div class="message-sender">${sender === 'user' ? 'Anda' : 'AI Coach'}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                    <div class="message-content">
+                        ${content}
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-avatar">
+                            <i class="fas fa-${sender === 'user' ? 'user' : 'robot'}"></i>
+                        </div>
+                        <div class="message-sender">${sender === 'user' ? 'Anda' : 'AI Coach'}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                    <div class="message-content">
+                        ${content}
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            // Add to chat history
+            chatHistory.push({
+                id: messageId,
+                sender,
+                content,
+                time,
+                color
+            });
+            
+            return messageId;
+        }
+
+        function addAITextResponse(topic, userQuestion, response) {
+            const messageId = addChatMessage("ai", `Untuk pertanyaan Anda tentang <strong>"${userQuestion}"</strong>, berikut solusi lengkapnya:`, "tosca", true);
+            
+            // Add solution
+            setTimeout(() => {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'solution-container solution-tosca';
+                solutionDiv.innerHTML = `
+                    <div class="solution-header">
+                        <div class="solution-type">
+                            <i class="fas fa-file-alt"></i>
+                            <span>SOLUSI TEKS LENGKAP</span>
+                        </div>
+                        <div class="solution-topic">${response.topic}</div>
+                    </div>
+                    <div class="solution-content text-solution">
+                        ${response.text.content}
+                        <div class="action-buttons">
+                            <button class="action-btn save-btn" onclick="saveSolution('${topic}')">
+                                <i class="fas fa-save"></i> Simpan
+                            </button>
+                            <button class="action-btn share-btn" onclick="shareSolution('${topic}')">
+                                <i class="fas fa-share-alt"></i> Bagikan
+                            </button>
+                            <button class="action-btn quiz-btn" onclick="startTopicQuiz('${topic}')">
+                                <i class="fas fa-question-circle"></i> Quiz
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById(`msg-${messageId}`).appendChild(solutionDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 300);
+        }
+
+        function addAIVideoResponse(topic, userQuestion, response) {
+            const messageId = addChatMessage("ai", `Untuk pertanyaan Anda tentang <strong>"${userQuestion}"</strong>, berikut video tutorialnya:`, "green", true);
+            
+            // Add solution
+            setTimeout(() => {
+                const solutionDiv = document.createElement('div');
+                solutionDiv.className = 'solution-container solution-green';
+                solutionDiv.innerHTML = `
+                    <div class="solution-header">
+                        <div class="solution-type">
+                            <i class="fas fa-video"></i>
+                            <span>SOLUSI VIDEO</span>
+                        </div>
+                        <div class="solution-topic">${response.topic}</div>
+                    </div>
+                    <div class="solution-content video-solution">
+                        <div class="video-placeholder">
+                            <i class="fas fa-play-circle"></i>
+                            <p>${response.video.title}</p>
+                        </div>
+                        <p>Durasi: ${response.video.duration} | Tingkat: ${response.video.level}</p>
+                        <button class="play-btn-video" onclick="playVideo('${topic}')">
+                            <i class="fas fa-play"></i> Putar Video
+                        </button>
+                        <div class="action-buttons" style="margin-top: 15px;">
+                            <button class="action-btn save-btn" onclick="saveSolution('${topic}')">
+                                <i class="fas fa-save"></i> Simpan Video
+                            </button>
+                            <button class="action-btn share-btn" onclick="shareSolution('${topic}')">
+                                <i class="fas fa-share-alt"></i> Bagikan
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById(`msg-${messageId}`).appendChild(solutionDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 300);
+        }
+
+        function addAIVoiceResponse(topic, userQuestion, response) {
+            const messageId = addChatMessage("ai", `Untuk pertanyaan Anda tentang <strong>"${userQuestion}"</strong>, berikut voice note penjelasan:`, "orange", true);
+            
+            // Add voice note
+            setTimeout(() => {
+                const voiceDiv = document.createElement('div');
+                voiceDiv.className = 'voice-message';
+                voiceDiv.innerHTML = `
+                    <div class="voice-header">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span>Voice Note AI Coach</span>
+                    </div>
+                    <p><strong>Topik:</strong> ${response.topic}</p>
+                    <p><strong>Durasi:</strong> ${response.voiceNote.duration}</p>
+                    <p><strong>Transkrip:</strong> ${response.voiceNote.transcript}</p>
+                    <div class="voice-player">
+                        <button class="play-btn" id="play-voice-${topic}">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="voice-waveform">
+                            <div class="voice-progress" id="voice-progress-${topic}"></div>
+                        </div>
+                        <div class="voice-duration">${response.voiceNote.duration}</div>
+                    </div>
+                `;
+                
+                document.getElementById(`msg-${messageId}`).appendChild(voiceDiv);
+                
+                // Add voice play functionality
+                const playBtn = document.getElementById(`play-voice-${topic}`);
+                const progressBar = document.getElementById(`voice-progress-${topic}`);
+                let isPlaying = false;
+                
+                playBtn.addEventListener('click', () => {
+                    isPlaying = !isPlaying;
+                    
+                    if (isPlaying) {
+                        playBtn.classList.add('playing');
+                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        
+                        // Simulate voice playback
+                        let progress = 0;
+                        const interval = setInterval(() => {
+                            progress += 0.5;
+                            progressBar.style.width = `${progress}%`;
+                            
+                            if (progress >= 100) {
+                                clearInterval(interval);
+                                isPlaying = false;
+                                playBtn.classList.remove('playing');
+                                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                                progressBar.style.width = '0%';
+                            }
+                        }, 100);
+                        
+                        // Store interval to clear if needed
+                        playBtn.dataset.intervalId = interval;
+                    } else {
+                        playBtn.classList.remove('playing');
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        clearInterval(playBtn.dataset.intervalId);
+                    }
+                });
+                
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 300);
+        }
+
+        function toggleVoiceRecording() {
+            if (!currentRecording) {
+                startVoiceRecording();
+            } else {
+                stopVoiceRecording();
+            }
+        }
+
+        function startVoiceRecording() {
+            showNotification("Merekam voice note... Bicara sekarang", "info");
+            voiceInputBtn.classList.add('recording');
+            voiceInputBtn.innerHTML = '<i class="fas fa-stop"></i>';
+            currentRecording = true;
+            
+            // Simulate recording for 3 seconds
+            setTimeout(() => {
+                if (currentRecording) {
+                    stopVoiceRecording();
+                }
+            }, 3000);
+        }
+
+        function stopVoiceRecording() {
+            showNotification("Voice note selesai. Mengirim...", "success");
+            voiceInputBtn.classList.remove('recording');
+            voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            currentRecording = false;
+            
+            // Simulate voice recognition
+            const sampleQuestions = [
+                "Bagaimana cara membuat password yang aman?",
+                "Apa itu phishing dan cara menghindarinya?",
+                "Bagaimana mengamankan akun media sosial?",
+                "Cara mencegah malware di smartphone?",
+                "Apa manfaat autentikasi dua faktor?"
+            ];
+            
+            const randomQuestion = sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)];
+            userInput.value = randomQuestion;
+            
+            // Auto-send after voice note
+            setTimeout(() => {
+                sendMessage();
+            }, 1000);
+        }
+
+        function startQuickQuiz() {
+            const topics = Object.keys(securityDatabase);
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            const topicData = securityDatabase[randomTopic];
+            
+            const questions = {
+                password: {
+                    question: "Manakah password yang PALING aman?",
+                    options: ["12345678", "password123", "KucingBiru@2024!", "namaanda123"],
+                    answer: 2
+                },
+                phishing: {
+                    question: "Apa tanda utama email phishing?",
+                    options: ["Pengirim resmi", "Permintaan informasi sensitif", "Tata bahasa sempurna", "Logo perusahaan"],
+                    answer: 1
+                },
+                sosmed: {
+                    question: "Informasi apa yang TIDAK aman dibagikan di media sosial?",
+                    options: ["Makanan favorit", "Alamat rumah lengkap", "Hobi", "Film kesukaan"],
+                    answer: 1
+                },
+                malware: {
+                    question: "Cara terbaik mencegah malware?",
+                    options: ["Klik semua link", "Update software rutin", "Nonaktifkan firewall", "Install software bajakan"],
+                    answer: 1
+                },
+                "2fa": {
+                    question: "Manakah metode 2FA PALING aman?",
+                    options: ["SMS", "Aplikasi Authenticator", "Email", "Pertanyaan keamanan"],
+                    answer: 1
+                }
+            };
+            
+            const quiz = questions[randomTopic] || questions.password;
+            
+            switchTab('chat');
+            
+            const quizMessage = `
+                <h4>🎯 Quick Quiz: ${topicData.topic}</h4>
+                <p><strong>${quiz.question}</strong></p>
+                <ol>
+                    ${quiz.options.map((opt, idx) => `<li>${opt}</li>`).join('')}
+                </ol>
+                <p><em>Jawab dengan mengetik nomor pilihan (1-4)</em></p>
+            `;
+            
+            addChatMessage("ai", quizMessage, "orange", true);
+            
+            // Listen for answer
+            const originalSend = sendBtn.onclick;
+            sendBtn.onclick = function() {
+                const answer = parseInt(userInput.value.trim());
+                if (answer >= 1 && answer <= 4) {
+                    const isCorrect = (answer - 1) === quiz.answer;
+                    
+                    const resultMessage = isCorrect ? 
+                        `✅ <strong>Benar!</strong> Jawaban Anda tepat. ${answer}. ${quiz.options[answer-1]} adalah pilihan teraman.` :
+                        `❌ <strong>Kurang tepat.</strong> Jawaban yang benar adalah ${quiz.answer+1}. ${quiz.options[quiz.answer]}.`;
+                    
+                    addChatMessage("ai", resultMessage, isCorrect ? "green" : "orange", true);
+                    
+                    // Restore original send function
+                    sendBtn.onclick = originalSend;
+                    userInput.value = '';
+                } else {
+                    showNotification("Masukkan angka 1-4 untuk menjawab quiz", "warning");
+                }
+            };
+        }
+
+        function startTopicQuiz(topic) {
+            // Similar to quick quiz but for specific topic
+            showNotification(`Memulai quiz tentang ${securityDatabase[topic].topic}...`, "info");
+            startQuickQuiz();
+        }
+
+        function saveSolution(topic) {
+            const solution = securityDatabase[topic];
+            showNotification(`Solusi "${solution.topic}" telah disimpan ke koleksi Anda`, "success");
+        }
+
+        function shareSolution(topic) {
+            const solution = securityDatabase[topic];
+            showNotification(`Membagikan solusi "${solution.topic}" via WhatsApp, Email, atau Media Sosial`, "info");
+        }
+
+        function playVideo(topic) {
+            const video = securityDatabase[topic].video;
+            showNotification(`Memutar video: "${video.title}"`, "info");
+        }
+
+        function updateMessageBadge() {
+            const badge = document.getElementById('message-badge');
+            if (badge) {
+                const current = parseInt(badge.textContent);
+                if (current > 1) {
+                    badge.textContent = current - 1;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        function showNotification(message, type = "info") {
+            notificationText.textContent = message;
+            
+            // Set color based on type
+            if (type === "success") {
+                notification.style.backgroundColor = "#4CAF50";
+            } else if (type === "warning") {
+                notification.style.backgroundColor = "#FF9800";
+            } else if (type === "error") {
+                notification.style.backgroundColor = "#F44336";
+            } else {
+                notification.style.backgroundColor = "var(--dark-tosca)";
+            }
+            
+            notification.classList.remove('hidden');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Initialize the app when page loads
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+    <script>
+    function goFullscreen() {
+      const el = document.documentElement;
+
+      if (el.requestFullscreen) {
+        el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen(); // Safari
+      } else if (el.msRequestFullscreen) {
+        el.msRequestFullscreen(); // IE
+      }
+    }
+  </script>
+</body>
+</html>
